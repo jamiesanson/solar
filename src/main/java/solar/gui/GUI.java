@@ -16,7 +16,8 @@ public class GUI extends Application {
         guiceContext = new GuiceContext(this, () -> Arrays.asList(new GUIConfig()));
         guiceContext.init();
         final WindowManager stageController = guiceContext.getInstance(WindowManager.class);
-        stageController.switchScene(WindowManager.SCENES.PERSON_LIST_SCENE);
+        // Move to initial scene
+        stageController.switchScene(WindowManager.SCENES.HOME_SCENE);
     }
 
     public void run(String[] args) {

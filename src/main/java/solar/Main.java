@@ -4,9 +4,6 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import solar.gui.GUI;
 
-/**
- * Created by No3x on 01.02.2017.
- */
 public class Main {
 
     public static void main(String[] args) {

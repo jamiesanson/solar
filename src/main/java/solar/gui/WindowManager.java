@@ -8,17 +8,13 @@ import javafx.stage.Stage;
 import javax.inject.Inject;
 import java.io.IOException;
 
-/**
- * Created by No3x on 01.02.2017.
- */
 public class WindowManager {
 
     @Inject
     private FXMLLoader fxmlLoader;
 
     public enum SCENES {
-        PERSON_LIST_SCENE("../controller/PersonList.fxml"),
-        PERSON_EDIT_SCENE("../controller/PersonEdit.fxml");
+        HOME_SCENE("../controller/home.fxml");
 
         private String sceneName;
 
@@ -47,8 +43,9 @@ public class WindowManager {
         }
         fxmlLoader.getController();
         Stage stage = new Stage();
-        stage.setTitle("Hello World");
-        stage.setScene(new Scene(root, 300, 275));
+        stage.setTitle("Solar");
+        stage.setScene(new Scene(root));
+        stage.setResizable(false);
         stage.show();
     }
 }
