@@ -15,7 +15,7 @@
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1098.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="solar.controller.HomeController">
    <JFXListView fx:id="targetsListView" layoutX="23.0" layoutY="55.0" prefHeight="239.0" prefWidth="163.0" />
    <JFXButton fx:id="addButton" layoutX="141.0" layoutY="297.0" prefHeight="25.0" prefWidth="46.0" text="Add" />
-   <Text layoutX="23.0" layoutY="39.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Temperature Targets">
+   <Text layoutX="23.0" layoutY="39.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Temperature Targets (°C)">
       <font>
          <Font name="System Bold" size="14.0" />
       </font>

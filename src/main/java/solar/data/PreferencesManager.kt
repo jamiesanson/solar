@@ -1,11 +1,11 @@
 @file:Suppress("UNCHECKED_CAST")
 
-package solar.local
+package solar.data
 
 import com.google.gson.Gson
 import java.util.prefs.Preferences
 
-class PreferencesHelper {
+class PreferencesManager {
 
     private companion object {
         val KEY_TARGETS = "targets"

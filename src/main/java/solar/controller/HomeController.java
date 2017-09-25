@@ -1,24 +1,23 @@
 package solar.controller;
 
+import com.fazecast.jSerialComm.SerialPort;
 import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTextField;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.chart.ScatterChart;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.input.MouseEvent;
-import org.jetbrains.annotations.NotNull;
+import solar.data.PreferencesManager;
+import solar.data.SerialManager;
 import solar.gui.WindowManager;
-import solar.local.PreferencesHelper;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -56,7 +55,10 @@ public class HomeController {
     WindowManager windowManager;
 
     @Inject
-    private PreferencesHelper preferencesHelper;
+    private PreferencesManager preferencesManager;
+
+    @Inject
+    private SerialManager serialManager;
 
     @FXML
     private void initialize() {
@@ -77,7 +79,7 @@ public class HomeController {
     }
 
     private void setupBindings() {
-        updateTargetListView(preferencesHelper.getTemperatureTargets());
+        updateTargetListView(preferencesManager.getTemperatureTargets());
 
         DecimalFormat format = new DecimalFormat( "#.0" );
 
@@ -97,6 +99,11 @@ public class HomeController {
         }));
 
         targetsListView.setItems(targets);
+        serialManager.getSolarPort()
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                        serialPort -> System.out.println("Found teensy on port: " + serialPort.getDescriptivePortName()),
+                        Throwable::printStackTrace);
     }
 
     private void updateTargetListView(ArrayList<Double> items) {
@@ -135,13 +142,17 @@ public class HomeController {
                 return 0;
             });
 
-            preferencesHelper.appendTemperatureTarget(target);
+            preferencesManager.appendTemperatureTarget(target);
             targetInputLayout.clear();
         }
     }
 
     private void onRunClicked(ActionEvent event) {
-
+        serialManager.getSolarPort()
+            .subscribeOn(Schedulers.io())
+            .subscribe(
+                    serialPort -> System.out.println("Found teensy on port: " + serialPort.getDescriptivePortName()),
+                    Throwable::printStackTrace);
     }
 
     private void onListViewItemClick(MouseEvent event) {
@@ -154,7 +165,7 @@ public class HomeController {
                     @Override
                     public void onOk() {
                         targets.remove(selected);
-                        preferencesHelper.removeTemperatureTarget(selected);
+                        preferencesManager.removeTemperatureTarget(selected);
                     }
 
                     @Override
