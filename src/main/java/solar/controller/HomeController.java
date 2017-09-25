@@ -148,31 +148,29 @@ public class HomeController {
     }
 
     private void onRunClicked(ActionEvent event) {
-        serialManager.getSolarPort()
-            .subscribeOn(Schedulers.io())
-            .subscribe(
-                    serialPort -> System.out.println("Found teensy on port: " + serialPort.getDescriptivePortName()),
-                    Throwable::printStackTrace);
+        serialManager.sendTemperatureTargets(targets).subscribeOn(Schedulers.io()).subscribe();
     }
 
     private void onListViewItemClick(MouseEvent event) {
         Double selected = targetsListView.getSelectionModel().getSelectedItem();
-        windowManager.showDialog(
-                "Confirm Delete",
-                "Remove Temperature Target",
-                "Are you sure you want to delete " + selected + "°C?",
-                new WindowManager.ConfirmationCallback() {
-                    @Override
-                    public void onOk() {
-                        targets.remove(selected);
-                        preferencesManager.removeTemperatureTarget(selected);
-                    }
+        if (selected != null) {
+            windowManager.showDialog(
+                    "Confirm Delete",
+                    "Remove Temperature Target",
+                    "Are you sure you want to delete " + selected + "°C?",
+                    new WindowManager.ConfirmationCallback() {
+                        @Override
+                        public void onOk() {
+                            targets.remove(selected);
+                            preferencesManager.removeTemperatureTarget(selected);
+                        }
 
-                    @Override
-                    public void onCancel() {
-                        // Do nothing
-                    }
-                });
+                        @Override
+                        public void onCancel() {
+                            // Do nothing
+                        }
+                    });
+        }
     }
 
 }
