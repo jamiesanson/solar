@@ -5,17 +5,27 @@ import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTextField;
 import io.reactivex.MaybeObserver;
 import io.reactivex.disposables.Disposable;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
+import javafx.scene.chart.ScatterChart;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
+import javafx.scene.text.TextFlow;
 import solar.database.DatabaseManager;
 import solar.database.TargetService;
 import solar.gui.WindowManager;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.text.ParsePosition;
 import java.util.ArrayList;
@@ -24,6 +34,12 @@ import java.util.ArrayList;
 public class HomeController {
 
     private static final ObservableList<Double> targets = FXCollections.observableArrayList();
+
+    @FXML
+    public ScatterChart ivChart;
+
+    @FXML
+    public TextArea consoleTextArea;
 
     @FXML
     private JFXButton runButton;
@@ -44,16 +60,31 @@ public class HomeController {
     WindowManager windowManager;
 
     @Inject
-    DatabaseManager databaseManager;
+    private DatabaseManager databaseManager;
 
     @FXML
     private void initialize() {
         setupBindings();
         setupListeners();
+        consoleTextArea.setEditable(false);
+        OutputStream out = new OutputStream() {
+            @Override
+            public void write(int b) throws IOException {
+                appendText(String.valueOf((char) b));
+            }
+        };
+        System.setOut(new PrintStream(out, true));
+
+        for (int i = 0; i < 50; i++) {
+            System.out.println("Yeet" + i);
+        }
+    }
+
+    private void appendText(String str) {
+        Platform.runLater(() -> consoleTextArea.appendText(str));
     }
 
     private void setupBindings() {
-        System.out.println("setupBindings");
         databaseManager.getTargets()
                 .subscribe(this::updateTargetListView, System.out::println);
 
@@ -83,7 +114,6 @@ public class HomeController {
 
     @SuppressWarnings("unchecked")
     private void setupListeners() {
-        System.out.println("setupListeners");
         runButton.setOnAction(this::onRunClicked);
         addButton.setOnAction(this::onAddTargetClicked);
     }
