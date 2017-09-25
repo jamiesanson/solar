@@ -1,12 +1,18 @@
 package solar.gui;
 
+import com.jfoenix.controls.JFXButton;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 
 import javax.inject.Inject;
+import javax.swing.*;
 import java.io.IOException;
+import java.util.Optional;
+import java.util.function.Function;
 
 public class WindowManager {
 
@@ -47,5 +53,24 @@ public class WindowManager {
         stage.setScene(new Scene(root));
         stage.setResizable(false);
         stage.show();
+    }
+
+    public void showDialog(String title, String headerTitle, String explanation, ConfirmationCallback callback) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(headerTitle);
+        alert.setContentText(explanation);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && (result.get() == ButtonType.OK)) {
+            callback.onOk();
+        } else {
+            callback.onCancel();
+        }
+    }
+
+    public interface ConfirmationCallback {
+        public void onOk() ;
+        public void onCancel();
     }
 }

@@ -1,26 +1,25 @@
 package solar.controller;
 
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTextField;
-import io.reactivex.MaybeObserver;
-import io.reactivex.disposables.Disposable;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.chart.ScatterChart;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
-import javafx.scene.text.TextFlow;
-import solar.database.DatabaseManager;
-import solar.database.TargetService;
+import javafx.scene.input.MouseEvent;
+import org.jetbrains.annotations.NotNull;
 import solar.gui.WindowManager;
+import solar.local.PreferencesHelper;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
@@ -28,12 +27,12 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.text.ParsePosition;
-import java.util.ArrayList;
+import java.util.*;
 
 @Singleton
 public class HomeController {
 
-    private static final ObservableList<Double> targets = FXCollections.observableArrayList();
+    private ObservableList<Double> targets = FXCollections.observableArrayList();
 
     @FXML
     public ScatterChart ivChart;
@@ -54,13 +53,10 @@ public class HomeController {
     private JFXListView<Double> targetsListView;
 
     @Inject
-    private TargetService targetService;
-
-    @Inject
     WindowManager windowManager;
 
     @Inject
-    private DatabaseManager databaseManager;
+    private PreferencesHelper preferencesHelper;
 
     @FXML
     private void initialize() {
@@ -74,10 +70,6 @@ public class HomeController {
             }
         };
         System.setOut(new PrintStream(out, true));
-
-        for (int i = 0; i < 50; i++) {
-            System.out.println("Yeet" + i);
-        }
     }
 
     private void appendText(String str) {
@@ -85,8 +77,7 @@ public class HomeController {
     }
 
     private void setupBindings() {
-        databaseManager.getTargets()
-                .subscribe(this::updateTargetListView, System.out::println);
+        updateTargetListView(preferencesHelper.getTemperatureTargets());
 
         DecimalFormat format = new DecimalFormat( "#.0" );
 
@@ -110,22 +101,67 @@ public class HomeController {
 
     private void updateTargetListView(ArrayList<Double> items) {
         targets.addAll(items);
+        targets.sort((o1, o2) -> {
+            Double result = o1-o2;
+
+            if (result < 0) return -1;
+            if (result == 0) return 0;
+            if (result > 0) return 1;
+
+            return 0;
+        });
     }
 
     @SuppressWarnings("unchecked")
     private void setupListeners() {
         runButton.setOnAction(this::onRunClicked);
         addButton.setOnAction(this::onAddTargetClicked);
+        targetsListView.setOnMouseClicked(this::onListViewItemClick);
     }
 
     private void onAddTargetClicked(ActionEvent event) {
-        double target = Double.parseDouble(targetInputLayout.getText());
-        targets.add(target);
-        targetInputLayout.clear();
+        String text = targetInputLayout.getText();
+        if (text.length() > 0) {
+            double target = Double.parseDouble(targetInputLayout.getText());
+
+            targets.add(target);
+            targets.sort((o1, o2) -> {
+                Double result = o1 - o2;
+
+                if (result < 0) return -1;
+                if (result == 0) return 0;
+                if (result > 0) return 1;
+
+                return 0;
+            });
+
+            preferencesHelper.appendTemperatureTarget(target);
+            targetInputLayout.clear();
+        }
     }
 
     private void onRunClicked(ActionEvent event) {
 
+    }
+
+    private void onListViewItemClick(MouseEvent event) {
+        Double selected = targetsListView.getSelectionModel().getSelectedItem();
+        windowManager.showDialog(
+                "Confirm Delete",
+                "Remove Temperature Target",
+                "Are you sure you want to delete " + selected + "°C?",
+                new WindowManager.ConfirmationCallback() {
+                    @Override
+                    public void onOk() {
+                        targets.remove(selected);
+                        preferencesHelper.removeTemperatureTarget(selected);
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        // Do nothing
+                    }
+                });
     }
 
 }
