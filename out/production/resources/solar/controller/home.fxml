@@ -38,4 +38,28 @@
       </font>
    </Text>
    <TextArea fx:id="consoleTextArea" layoutX="221.0" layoutY="573.0" prefHeight="166.0" prefWidth="849.0" />
+   <Text layoutX="22.0" layoutY="434.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Thermocouple Temperature" />
+   <Text layoutX="23.0" layoutY="486.0" strokeType="OUTSIDE" strokeWidth="0.0" text="RTD-1 Temperature" />
+   <Text layoutX="23.0" layoutY="541.0" strokeType="OUTSIDE" strokeWidth="0.0" text="RTD-2 Temperature" />
+   <Text layoutX="23.0" layoutY="368.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Estimated Cell Temperature" />
+   <Text fx:id="estimatedTemperatureText" layoutX="22.0" layoutY="394.0" strokeType="OUTSIDE" strokeWidth="0.0" text="---" wrappingWidth="131.00000315904617">
+      <font>
+         <Font name="System Bold" size="18.0" />
+      </font>
+   </Text>
+   <Text fx:id="thermocoupleTemperatureText" layoutX="22.0" layoutY="457.0" strokeType="OUTSIDE" strokeWidth="0.0" text="---" wrappingWidth="131.00000315904617">
+      <font>
+         <Font name="System Bold" size="18.0" />
+      </font>
+   </Text>
+   <Text fx:id="rtd2TemperatureText" layoutX="22.0" layoutY="566.0" strokeType="OUTSIDE" strokeWidth="0.0" text="---" wrappingWidth="131.00000315904617">
+      <font>
+         <Font name="System Bold" size="18.0" />
+      </font>
+   </Text>
+   <Text fx:id="rtd1TemperatureText" layoutX="22.0" layoutY="509.0" strokeType="OUTSIDE" strokeWidth="0.0" text="---" wrappingWidth="131.00000315904617">
+      <font>
+         <Font name="System Bold" size="18.0" />
+      </font>
+   </Text>
 </AnchorPane>

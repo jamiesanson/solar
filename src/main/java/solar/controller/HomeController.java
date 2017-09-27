@@ -15,8 +15,10 @@ import javafx.scene.chart.ScatterChart;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.text.Text;
 import solar.data.PreferencesManager;
 import solar.data.SerialManager;
+import solar.data.model.DeviceState;
 import solar.gui.WindowManager;
 
 import javax.inject.Inject;
@@ -32,6 +34,18 @@ import java.util.*;
 public class HomeController {
 
     private ObservableList<Double> targets = FXCollections.observableArrayList();
+
+    @FXML
+    public Text estimatedTemperatureText;
+
+    @FXML
+    public Text thermocoupleTemperatureText;
+
+    @FXML
+    public Text rtd2TemperatureText;
+
+    @FXML
+    public Text rtd1TemperatureText;
 
     @FXML
     public ScatterChart ivChart;
@@ -62,9 +76,6 @@ public class HomeController {
 
     @FXML
     private void initialize() {
-        setupBindings();
-        setupListeners();
-        consoleTextArea.setEditable(false);
         OutputStream out = new OutputStream() {
             @Override
             public void write(int b) throws IOException {
@@ -72,6 +83,9 @@ public class HomeController {
             }
         };
         System.setOut(new PrintStream(out, true));
+        setupBindings();
+        setupListeners();
+        consoleTextArea.setEditable(false);
     }
 
     private void appendText(String str) {
@@ -99,11 +113,17 @@ public class HomeController {
         }));
 
         targetsListView.setItems(targets);
-        serialManager.getSolarPort()
+        System.out.println("Discovering device");
+
+        serialManager.getStateRx()
                 .subscribeOn(Schedulers.io())
-                .subscribe(
-                        serialPort -> System.out.println("Found teensy on port: " + serialPort.getDescriptivePortName()),
-                        Throwable::printStackTrace);
+                .subscribe(this::onNewState, Throwable::printStackTrace);
+    }
+
+    private void onNewState(DeviceState deviceState) {
+        thermocoupleTemperatureText.setText(String.format("%4.2f °C", deviceState.getThermTemp()));
+        rtd1TemperatureText.setText(String.format("%4.2f °C", deviceState.getRtd1Temp()));
+        rtd2TemperatureText.setText(String.format("%4.2f °C", deviceState.getRtd2Temp()));
     }
 
     private void updateTargetListView(ArrayList<Double> items) {
@@ -148,7 +168,7 @@ public class HomeController {
     }
 
     private void onRunClicked(ActionEvent event) {
-        serialManager.sendTemperatureTargets(targets).subscribeOn(Schedulers.io()).subscribe();
+        // TODO: Wait for temperature targets, then send Serial to runSweep
     }
 
     private void onListViewItemClick(MouseEvent event) {
