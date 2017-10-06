@@ -1,6 +1,5 @@
 package solar.gui;
 
-import com.jfoenix.controls.JFXButton;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -9,10 +8,8 @@ import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 
 import javax.inject.Inject;
-import javax.swing.*;
 import java.io.IOException;
 import java.util.Optional;
-import java.util.function.Function;
 
 public class WindowManager {
 
